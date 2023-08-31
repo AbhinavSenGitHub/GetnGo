@@ -1,0 +1,19 @@
+.concent-div{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding:  60px 80px;
+
+    > .button{
+        border: 1px solid rgb(0, 0, 0);
+        padding: 10px;
+        margin-top: 40px;
+        letter-spacing: 1px;
+        background: linear-gradient(219deg, rgba(10,137,214,0.8800770308123249) 0%, rgba(70,39,97,1) 100%);
+        color: white;
+        border-radius: 20px;
+        width: 100px;
+    }
+}

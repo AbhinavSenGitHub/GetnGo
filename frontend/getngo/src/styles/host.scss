@@ -1,0 +1,83 @@
+@import "color";
+.host-main{
+    // background-color: rosybrown;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    // height: 100ch;
+
+    > .host-sub-main {
+        margin-top: 30px;
+        // border: 2px solid #e1dddd;
+        // border-radius: 20px;
+        margin-bottom: 50px;
+        width: 100%;
+
+        >.heading{
+            color: $third;
+        }
+        >.heading, .heading-p{
+            margin-top: 10px;
+            text-align: center;
+        }
+        > .heading-p{
+            color: gray;
+            margin-bottom: 15px;
+        }
+        > form > .img-add-option {
+            color: white;
+        }
+
+        > form > .input-fields{
+            margin-left: 20px;
+            margin-top: 30px;
+        }
+        >form > .input-fields > div{
+            margin-top: 10px;
+            color: $third;
+            font-size: $third;
+        }
+        >form > .input-fields > div> input, select{
+            margin-top: 7px;
+            width: 40%;
+            border-radius: 5px;
+            height: 30px;
+            border-top: 1px solid gray;
+            border-right: 1px solid gray;
+            border-bottom: 1px solid gray;
+            border-left: 1px solid gray;
+            
+        }
+        >form > .input-fields > div> input:hover, select:hover{
+            // border-color: red;
+            border: 2px solid #08c9e7;
+            box-shadow: 0 0px 3px #08c9e7;
+        }
+        .btn-host-submit{
+            background: rgb(10,137,214);
+            border-radius: 10px;
+            padding: 10px;
+            width: 9rem;
+            background: linear-gradient(219deg, rgba(10,137,214,0.8800770308123249) 0%, rgba(70,39,97,1) 100%);
+            color: white;
+            margin-top: 10px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            font-size: 17px;
+
+            > a{
+                color: white;
+            }
+        }
+        @media screen and (max-width: 775px) {
+            >form > .input-fields > div> input, select{
+                width: 90%
+            }
+        }
+    }
+
+    
+}

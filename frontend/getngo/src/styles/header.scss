@@ -1,0 +1,98 @@
+nav{
+    width: 100%;
+    padding: 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: sticky;
+    padding-left: 2.5rem;
+    padding-right: 2.5rem;
+    border-bottom: 1px solid gray;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); 
+    background-color: white;
+    top: 0;
+    z-index: 9999;
+    // line-height: 70px;
+    > h1 {
+        font-size:  35px;
+        color: rgb(23, 127, 212);
+    }
+
+    > main > a{
+        margin-right: 23px;
+        font-size: 17px;
+        text-transform: uppercase;
+        color: black;
+        position: sticky;           //reelative
+        transition: 0.2s ease-in-out;
+        
+    }
+    >main > .nav-rs:hover, > main > .active{
+        color: rgb(23, 127, 212);
+    }
+    > main > .nav-rs:hover::after, > main > .active::after{
+        content: "";
+        width: 30px;
+        height: 2px;
+        background: rgb(23, 127, 212);
+        position: absolute;
+        bottom: 34px;
+        left: 0px;
+        top: 20px
+    }
+    .hamburger-btn{
+        display: none;
+    }
+    @media screen and (max-width: 695px) {
+        .nav-bar-rs{
+            display: none;
+        }
+        .nav-main-rs{
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            justify-content: flex-start;
+            // text-align: center;
+            // align-items: center;
+            position: fixed;
+            top: 92px;
+            right: 0px;
+            width: 50%;
+            height: 100vh;
+            background-color: rgb(23, 127, 212);
+            box-shadow: 0 40px 60px rgba(0, 0, 0, 0.1);
+            padding: 40px 0 0 10px;
+            margin: -20px 0;     
+            // 
+        }
+        // .nav-rs-appear{
+        //     display: none;
+        // }
+        > main > .nav-rs:hover::after, > main > .active::after{
+            content: "";
+            width: 30px;
+            height: 2px;
+            background: rgb(239, 239, 239);
+            position: absolute;
+            bottom: 34px;
+            left: 0px;
+            top: 20px;
+        }
+        .nav-rs{
+            margin-top: 10px ; 
+            margin-bottom: 10px;   
+        }
+        >main > .nav-rs:hover, > main > .active{
+            color: rgb(234, 234, 234);;
+            
+        }
+
+        >main > .nav-rs{
+            color: white;        
+        }
+        .hamburger-btn{
+            display: block;
+            font-size: 23px;
+        }
+    }
+}
