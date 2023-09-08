@@ -11,6 +11,12 @@ const multer = require("multer");
 const path = require("path");
 const passportSetup = require("./passport");
 // const authRoutes = require("./routes/auth");
+
+const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
+const SECRET_KEY = 'your-secret-key';
+
+
 const app = express();
 const formidable = require("formidable");
 const cloudinary = require("cloudinary");
@@ -54,9 +60,7 @@ const storage = multer.diskStorage({
     return cb(null, `${Date.now()}-${file.originalname}`);
   },
 });
-
 const upload = multer({ storage: storage }); //this will allow to save and any time we need to upload any file we will use this variable called * upload *
-
 // session set-up
 app.use(
   session({
@@ -75,75 +79,62 @@ passport.serializeUser(function (user, done) {
 passport.deserializeUser(function (user, done) {
   done(null, user);
 });
-let userID = "";
-let userNAME = "";
+
 app.post("/api/signin", async (req, res) => {
   const { username, password, number, concent } = req.body;
-  userNAME = username;
-  User.register(
-    { username: username, number: number, concent: concent },
-    password,
-    (err, user) => {
-      if (err) {
-        console.log(err);
-      } else {
-        passport.authenticate("local")(req, res, function () {
-          userID = user._id;
-          // res.redirect("/posts");
-        });
-        res.json({ success: true, redirectUrl: "/carPost" });
-      }
+  try {
+    // Check if the username is already taken
+    const existingUser = await User.findOne({ number });
+    if (existingUser) {
+      res.status(409).json({ message: 'Username already exists', success: false });
+    } else {
+      const hashedPassword = await bcrypt.hash(password, 10);
+      // Create a new user
+      const newUser = new User({
+        username,
+        password: hashedPassword,
+        number,
+        concent
+      });
+      // Save the user in the database
+      await newUser.save()
+      let token = jwt.sign({ number }, SECRET_KEY, { expiresIn: '1h' });
+      const successMessage = 'Signup successful! Welcome to our platform.'
+      res.status(200).json({ message: successMessage, success: true, token });
     }
-  );
+  } catch (error) {
+    console.error('Error signing up:', error);
+    res.status(500).json({ error: 'An error occurred while signing up' });
+  }
 });
 
-app.post("/api/login", (req, res) => {
-  const { username, password } = req.body;
-  userNAME = username;
-  req.login(
-    {
-      password: password,
-    },
-    (err) => {
-      if (err) {
-        console.log(err);
-      } else {
-        console.log("Successfuly user login");
-        res.json({ success: true, redirectUrl: "/carPost" });
-      }
+
+app.post("/api/login", async (req, res) => {
+  const { number, password } = req.body;
+
+  try {
+    // Find the user by username
+    const user = await User.findOne({ number });
+    if (!user) {
+      return res.status(401).json({ message: 'User not found with that number', success: false });
     }
-  );
-});
-// passport.use(new LocalStrategy(
-//   (username, password, done) => {
-//       // Replace with your user authentication logic
-//       if (username === 'user' && password === 'password') {
-//           return done(null, { id: 1, username: 'user' });
-//       } else {
-//           return done(null, false, { message: 'Invalid credentials' });
-//       }
-//   }
-// ));
-
-// app.post("/api/login", (req, res) => {
-//   // Redirect or send a success response
-//   res.json({ success: true, redirectUrl: '/carPost' });
-// });
-// app.post('/login', passport.authenticate("local", {
-//   successRedirect: "/profile",
-//   failureRedirect: "/login"
-// }), function (req, res, next) {
-// });
-
-app.get("/api/logout", (req, res, next) => {
-  req.logout();
-  req.session = null; // Clear the session data
-  console.log("User logged out successfully"); // Log the message
-  res.status(200).end();
-  userNAME = null;
-});
+    // Compare the provided password with the hashed password in the database
+    const passwordMatch = await bcrypt.compare(password, user.password);
+    if (!passwordMatch) {
+      return res.status(401).json({ message: 'Invalid password', success: false });
+    }
+    const token = jwt.sign({ number: number }, SECRET_KEY);
+    console.log(token);
+    // res.json({ token });
+    res.status(200).json({ message: 'Login successful', success: true, token });
+  } catch (error) {
+    console.error('Error logging in:', error);
+    res.status(500).json({ error: 'An error occurred while logging in' });
+  }
+})
 
 app.post("/api/host", upload.array("image", 16), async (req, res) => {
+  console.log("post log");
   const {
     vehicle,
     company,
@@ -156,9 +147,8 @@ app.post("/api/host", upload.array("image", 16), async (req, res) => {
     kmDriven,
     cityName,
     feedback,
-    price,
-  } = req.body;
-  // const imagePath = req.file.path;
+    price, } = req.body;
+
   let imagePath = [];
   for (let i = 0; i < req.files.length; i++) {
     const { secure_url, public_id } = await cloudinary.v2.uploader.upload(
@@ -168,124 +158,91 @@ app.post("/api/host", upload.array("image", 16), async (req, res) => {
         fetch_format: "webp",
       }
     );
-    // console.log(secure_url, public_id)
     imagePath.push({ secure_url, public_id });
   }
+  try {
+    const decodedToken = jwt.verify(req.headers.authorization.split(' ')[1], SECRET_KEY);
+    const number = decodedToken.number;
 
-  const userHost = {
-    image: imagePath,
-    vehicle,
-    company,
-    name,
-    fuleType,
-    registrationYear,
-    transmissionType,
-    seats,
-    fastag,
-    kmDriven,
-    cityName,
-    feedback,
-    price,
-  };
-  console.log("login_id compose:- " + req.user._id);
-  User.updateOne({ username: userNAME }, { $push: { host: userHost } })
-    .then(() => {
-      console.log("Post insert Successful");
-      res.json({ success: true, redirectUrl: "/carPost" });
-    })
-    .catch((err) => {
-      console.log("Error :- ", err);
+    // Find the user by username
+    const user = await User.findOne({ number });
+    if (!user) {
+      return res.status(404).json({ message: 'User not found', success: false });
+    }
+    // Add the new post to the user's posts array
+    user.host.push({
+      image: imagePath,
+      vehicle,
+      company,
+      name,
+      fuleType,
+      registrationYear,
+      transmissionType,
+      seats,
+      fastag,
+      kmDriven,
+      cityName,
+      feedback,
+      price,
     });
-  res.json(userHost)
 
-});
+    // Save the updated user document
+    await user.save()
+    res.status(201).json({ message: 'Post created successfully', success: true });
+  } catch (error) {
+    console.error('Error creating post:', error);
+    res.status(500).json({ error: 'An error occurred while creating the post' });
+  }
 
+})
+
+
+
+function authenticateJWT(req, res, next) {
+  const token = req.header('Authorization');
+  console.log("token: " + token);
+  if (!token) return res.status(401).json({ message: 'Unauthorized' });
+  jwt.verify(token, SECRET_KEY, (err, user) => {
+    if (err) return res.status(403).json({ message: 'Forbidden' });
+    req.user = user;
+    next();
+  });
+}
+
+app.get("/api/profile", authenticateJWT, async (req, res) => {
+  const user = req.user.number;
+  console.log("profile:- " + user);
+  try {
+    const userId = req.user._id; // Extract user ID from the JWT payload
+    console.log("userId:- " + userId)
+    // Fetch posts from the database based on userId using Mongoose
+    const userPosts = await Post.find({ userId });
+    console.log("userPosts:- " + userPosts)
+    res.json(userPosts);
+  } catch (error) {
+    console.error('Error fetching user posts', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+  
+})
 app.get("/demo", async (req, res) => {
   const docs = await User.find({});
   res.json(docs);
-});
-app.get("/api/authenticated", (req, res) => {
-  console.log("req for check" + req.isAuthenticated());
-  res.json({ authenticated: req.isAuthenticated() });
-});
-
-// app.get("/profile", async (req, res) => {
-//   const docs = await User.findById(req.user._id);
-//   console.log(docs)
-// });
-// res.json(docs)
-
-// .then((foundUser) => {
-//   console.log(foundUser.userPost);
-//   const username = foundUser.username;
-//   const userArray = foundUser.userPost;
-//   res.render("activities", {username: username, userPost: userArray});
-// })
-// .catch((error) => {
-//     console.error('Error retrieving post:', error);
-//     res.status(500).send('Error retrieving post');
-//   });
+})
 
 app.listen(1234, () => {
   console.log("Running on port 1234");
-});
+})
 
 
-
-// app.post("/api/host", upload.array("image", 16), async (req, res) => {
-//   const {
-//     vehicle,
-//     company,
-//     name,
-//     fuleType,
-//     registrationYear,
-//     transmissionType,
-//     seats,
-//     fastag,
-//     kmDriven,
-//     cityName,
-//     feedback,
-//     price,
-//   } = req.body;
-//   // const imagePath = req.file.path;
-//   let imagePath = [];
-//   for (let i = 0; i < req.files.length; i++) {
-//     const { secure_url, public_id } = await cloudinary.v2.uploader.upload(
-//       req.files[i].path,
-//       {
-//         folder: "getngo",
-//         fetch_format: "webp",
-//       }
-//     );
-//     // console.log(secure_url, public_id)
-//     imagePath.push({ secure_url, public_id });
-//   }
-
-//   const userHost = {
-//     image: imagePath,
-//     vehicle,
-//     company,
-//     name,
-//     fuleType,
-//     registrationYear,
-//     transmissionType,
-//     seats,
-//     fastag,
-//     kmDriven,
-//     cityName,
-//     feedback,
-//     price,
-//   };
-
-//   console.log("login_id compose:- " + userID);
-//   // res.json({ success: true, redirectUrl: '/carPost' });
-//   User.updateOne({ username: userNAME }, { $push: { host: userHost } })
-//     .then(() => {
-//       console.log("Post insert Successful");
-//       res.json({ success: true, redirectUrl: "/carPost" });
-//     })
-//     .catch((err) => {
-//       console.log("Error :- ", err);
-//     });
-//   // res.json(userHost)
-// });
+// profile
+// try {
+  //   const userPosts = User.findOne("1234567890")
+  //   if (!userPosts) {
+  //     return res.status(404).json({ message: 'User not found', success: false });
+  //   }
+  //   res.json(userPosts);
+  // } catch (error) {
+  //   console.error('Error fetching posts:', error);
+  //   res.status(500).json({ error: 'Unable to fetch posts' });
+  // }

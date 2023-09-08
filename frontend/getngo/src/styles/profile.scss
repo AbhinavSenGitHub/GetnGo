@@ -9,35 +9,16 @@
         height: 100px;
     }
     >.profile-text{
-        padding: 40px 10px;
+        padding: 20px 10px;
         text-align: center;
-
-        >div > button {
-            margin-top: 40px;
-            padding: 6px;
-            width: 150px;
-            height: 38px;
-            font-size: 1.2rem;
-            border-radius: 20px;
-            background: linear-gradient(009deg, rgba(10,137,214,0.8800770308123249) 0%, rgb(189, 122, 218) 100%);
-            color: white
-        }
-
-        > div > p{
-            margin-bottom: 30px;
-        }
-        > div > .not-login{
-            display: flex;
-            flex-direction: row;
-            justify-content: space-around;
-            text-align: center;
-            > a{
-                border: 1px solid black;
-                padding: 7px;
-                color: white;
-                background: linear-gradient(009deg, rgba(10,137,214,0.8800770308123249) 0%, rgb(189, 122, 218) 100%);
-                border-radius: 20px;
-                width: 130px;
+        >div {
+            >p, h1{
+                margin: 10px;
+                font-size: 1.3rem;
+                font-family: 'Chivo Mono', monospace;
+            }
+            > .total-post{
+                margin-top: 30px;
             }
         }
     }

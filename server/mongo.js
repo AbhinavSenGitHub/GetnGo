@@ -1,7 +1,6 @@
 const mongoose = require("mongoose");
 const passportLocalMongoose = require("passport-local-mongoose");
 const findOrCreate = require('mongoose-findorcreate');
-
 mongoose.connect("mongodb://0.0.0.0:27017/getngo")      //"mongodb://0.0.0.0:27017/getngo"
 .then(() => {
     console.log("conneted to mongoose")
@@ -22,7 +21,6 @@ mongoose.connect("mongodb://0.0.0.0:27017/getngo")      //"mongodb://0.0.0.0:270
       concent:{
         type: String,
         required: true
-    
       },
       host:[],    
   },
@@ -31,5 +29,4 @@ mongoose.connect("mongodb://0.0.0.0:27017/getngo")      //"mongodb://0.0.0.0:270
   userSchema.plugin(passportLocalMongoose);
   userSchema.plugin(findOrCreate);
   const User = mongoose.model("user", userSchema);
-
   module.exports = User;

@@ -4,34 +4,36 @@ import { Link } from "react-router-dom";
 import { useNavigate } from 'react-router';
 import { FaGoogle } from 'react-icons/fa';
 import axios from "axios";
-// import { UserContext } from '../App'
+import { setToken } from './tokenService';
 const SignIn = () => {
-
   const googleAuth = () => {
     window.open(
       `${process.env.REACT_APP_API_URL}/auth/google/carpost`,
       "_self"
     );
   }
-  // const {state, dispatch} = useContext(UserContext);
-  
   // user signUp data
   const navigate = useNavigate();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [number, setNumber] = useState('');
-  const [concent, setConcent] = useState('');
-  // const agreeCheckbox = document.getElementById('agreeCheckbox');
-  
+  const [concent, setConcent] = useState(''); 
   const submit = async (e) => {
     e.preventDefault()
     try {
        const response = await axios.post('http://localhost:1234/api/signin', {
         username: username, password: password, number: number, concent: concent,
       });
-      if(response.data.success){
-        // dispatch({type:"USER", payload:true});
+      const {token} = response.data;
+      if(response.status === 200){
+        localStorage.setItem(token, response.data.token); 
+        alert(response.data.message);
+        
         navigate('/carPost');      
+      }else if(response.status === 409 && !response.data.success){
+        alert(response.data.message);
+      }else{
+        alert(response.data.message)
       }
     }
     catch (e) {

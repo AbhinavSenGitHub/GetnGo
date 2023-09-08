@@ -1,37 +1,37 @@
-import React, { useContext, useState } from 'react';
+import React, { useState } from 'react';
 import profile from "../assest/profile.png";
 import { Link } from "react-router-dom";
-// import ser from ""
 import { FaGoogle } from 'react-icons/fa';
 import axios from "axios";
 import { useNavigate } from 'react-router';
-// import { UserContext } from '../App';
+
 const Login = () => {
 
-  // const {state, dispatch} = useContext(UserContext);
-
-  const [username, setUsername] = useState('');
+  const [number, setNumber] = useState('');
   const [password, setPassword] = useState('');
   const navigate = useNavigate();
-  // const [loggedIn, setLoggedIn] = useState(false); 
 
   const submit = async (e) => {
     e.preventDefault()
     try {
       const response = await axios.post('http://localhost:1234/api/login', {
-        username: username,
+        number: number,
         password: password
       })
-
-      if(response.data.success){
-        // dispatch({type:"USER", payload:true});
+      if (response.status === 200 && response.data.success) {
+        // Handle successful login
+        console.log('Login successful');
+        localStorage.setItem('token', response.data.token);
+        alert(response.data.message);
         navigate('/carPost');
-        console.log("success")
-        
-      }
+    }else if(response.status === 401 && !response.data.success){
+      alert(response.data.message);
+    }else {
+      alert(response.data.message); // Display error message in alert
+    }
     }
     catch (e) {
-      console.log(e);
+      console.log("Login error:- ", e);
     }
   }
 
@@ -46,10 +46,8 @@ const Login = () => {
               <img src={profile} alt="" />
             </div>
             <div className="input-div">
-              <input type="text" name="username" onChange={(e) => { setUsername(e.target.value) }} placeholder='username' />
+              <input type="text" name="number" onChange={(e) => { setNumber(e.target.value) }} placeholder='number' />
               <input type="password" name="password" onChange={(e) => { setPassword(e.target.value) }} placeholder='Password' />
-              {/* <input type="text" name="number" onChange={(e) => { setNumber(e.target.value) }} placeholder='Phone number' /> */}
-
               <label>or</label>
               <div className="google-icon">
                 <div className="FaGoogle-icon"><FaGoogle /></div>

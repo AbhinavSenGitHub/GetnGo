@@ -1,17 +1,33 @@
-import React, { useContext } from 'react';
+import React, { useEffect } from 'react';
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { HashLink } from "react-router-hash-link";
 import { FaBars, FaTimes } from 'react-icons/fa';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUser } from '@fortawesome/free-solid-svg-icons';
-// import { UserContext } from '../App';
+
 const Header = () => {
-  // const {state, dispatch} = useContext(UserContext);
+
   const [clicked, setClicked] = useState(true);
+  const [loggedIn, setLoggedIn] = useState(false);
+  const navigate = useNavigate();
       const toggleMenu = () => {
         setClicked(!clicked);
       };
+      useEffect(() => {
+        // Check if the user is logged in by verifying the presence of a JWT token
+        const token = localStorage.getItem('token');
+        if (token) {
+          setLoggedIn(true);
+        } else {
+          setLoggedIn(false);
+        }
+      }, []);
+      const handleLogout = () => {
+        localStorage.removeItem('token');
+        setLoggedIn(false);
+        navigate('/login');
+      }
   return (
     <nav>
       <h1>GetnGo</h1>
@@ -19,8 +35,16 @@ const Header = () => {
         <HashLink to = "/" className=" nav-rs">Home</HashLink> 
         <HashLink to = "/servies" className="nav-rs">Services</HashLink>
         <HashLink to = "/carPost" className="nav-rs">Ride</HashLink>
-        <Link to="/profile"><FontAwesomeIcon icon={faUser} /></Link>
-        <Link to = "/signIn" className="nav-rs" >Sign-Up</Link>
+        {/* {!loggedIn?  */}
+        {/* ( */}
+          <div className="login-part">
+          <Link to="/profile"><FontAwesomeIcon icon={faUser} /></Link>
+          <button type="submit" onClick={handleLogout}>Logout</button>
+          </div>
+        {/* ): */}
+        <Link to = "/signIn" className="nav-rs" >Sign-Up</Link> 
+        {/* }    */}
+        
       </main>
       <div className="hamburger-btn" onClick={toggleMenu}>{clicked ? <FaBars className="hamburger" /> : <FaTimes/> }</div>
     </nav>

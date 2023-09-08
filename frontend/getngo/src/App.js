@@ -1,4 +1,4 @@
-import React, { createContext, useReducer } from "react";
+import React, { useEffect, useReducer, useState } from "react";
 import {BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import Header from "./Components/Header";
 import Home from "./Components/Home";
@@ -19,26 +19,36 @@ import "./styles/profile.scss";
 import "./styles/carPost.scss";
 import "./styles/concent.scss";
 
-export const UserContext = createContext();
-
 function App() {
-  const [state, dispatch] = useReducer(reducer, initialState)
+ 
+  const [authenticated, setAuthenticated] = useState(false);
+ 
+  useEffect(() => {
+    // Check if the user is authenticated by verifying the presence of a JWT token in localStorage
+    const token = localStorage.getItem('token');
+    if (token) {
+      setAuthenticated(true);
+    } else {
+      setAuthenticated(false);
+    }
+    
+  }, []);
   return (
     <>
-    <UserContext.Provider value={{state, dispatch}}>
+    
     <Router>
     <Header />
       <Routes>
       <Route path="/" element= {<Home/>} />
       <Route path="/signin" element= {<SignIn/>} /> 
       <Route path="/login" element= {<Login/>} />   
-      <Route path="/host" element= {<Host/>} /> 
+      {/* <Route path="/host" element= {<Host/>} />  */}
+      <Route path="/host" element={ authenticated ? <Host /> : <Login />} />
       <Route path="/carpost" element= {<CarPost/>} />  
       <Route path="/profile" element= {<Profile/>} />
       <Route path="/concent" element= {<Concent/>} />              
       </Routes>
     </Router>
-    </UserContext.Provider>
     </>
   );
 }

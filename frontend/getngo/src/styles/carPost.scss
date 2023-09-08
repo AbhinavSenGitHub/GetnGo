@@ -2,7 +2,7 @@
 
 .notexist{
     display: none;
-}
+} 
 .profile{
     padding: 7px;
     margin-top: -10px;
@@ -12,10 +12,6 @@
     width: 100%;
 }
 .carPost{
-    // display: flex;
-    // flex-direction: column;
-    // justify-content: center;
-    // align-items: center;
     > .searchOption{
         margin: 20px;
         margin-bottom: 40px;
@@ -33,23 +29,7 @@
     color: rgb(43, 42, 42);  
     padding-bottom: 3px;
 }
-// .main-component{
-//     // display: flex;
-//     // flex-direction: row;
-// }
-// .outer-card{
-//     display: grid;
-//     place-items: center;
-//     // background-color: black;
-//     grid-template-columns: 1fr 1fr 1fr;
-// }
-// .card{
-//     width: 400px;
-// }
-// 02
-
 .card{
-    // margin: 10px;
     margin-bottom: 60px;
     width: 1000px;
     padding: 7px;
@@ -78,7 +58,6 @@
         margin-bottom: 8px;
     }
     >.location{
-        // border: 1px solid black;
         padding: 10px;
         >h4{
             color: #454545;
@@ -88,7 +67,6 @@
 
         > p {
             color: rgb(8, 245, 8);
-
         }
     }
 }
@@ -96,26 +74,24 @@
     display: grid;
     place-items: center;
     margin: 0 10px;
-    @media screen and (max-width: 1038px){
-        grid-template-columns: 1fr;
-        // grid-template-rows: 1fr; 
-
+    @media screen and (max-width: 1019px){
         .card{
-            width: 100%;
+            width: 800px;
+        }
+    }
+    @media screen and (max-width: 816px){
+        .card{
+            width: 500px;
         }
     }
         @media screen and (max-width: 580px){
         grid-template-columns: 1fr;
-        // grid-template-rows: 1fr; 
-
         .card{
             width: 400px;
         }
     }
     @media screen and (max-width: 416px){
         grid-template-columns: 1fr;
-        // grid-template-rows: 1fr; 
-
         .card{
             width: 340px;
         }

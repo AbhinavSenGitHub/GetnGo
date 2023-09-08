@@ -4,7 +4,7 @@ import {Link} from "react-router-dom";
 import { Carousel } from "react-responsive-carousel";
 import "react-responsive-carousel/lib/styles/carousel.min.css";
 import { useNavigate } from "react-router-dom";
-const Host = () => {
+const Host = (authenticated) => {
   const navigate = useNavigate();
   const [image, setImage] = useState([]);
   const [filePreviews, setFilePreviews] = useState([]);
@@ -52,7 +52,11 @@ const onSubmit = async (e) => {
   formData.append("price", price);
 
   try{
-     const response = await axios.post('http://localhost:1234/api/host', formData, { headers: {'Content-Type': 'multipart/form-data'}})
+     const response = await axios.post('http://localhost:1234/api/host', formData, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('token')}`,
+      },
+    })
 
     if(response.data.success){
       navigate('/carPost');

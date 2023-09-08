@@ -1,8 +1,9 @@
 import React from 'react'
-// import car from "../assest/carImg.png";
 import car from "../assest/myride.jpg"
 import { Link } from 'react-router-dom'
+
 const Home = () => {
+
   return (
     <>
         <div className="home1">

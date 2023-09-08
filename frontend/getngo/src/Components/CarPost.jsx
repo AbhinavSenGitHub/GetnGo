@@ -13,7 +13,6 @@ const Card = ({ username, number, images, company, name, registrationYear, trans
       <div className="profile">
         <h3>{username}</h3>
       </div>
- 
       <Carousel>
           {images.map((imagess, index) => (
             <div className="image-container" key={index}>
@@ -47,15 +46,13 @@ const CarPost = () => {
         })
         const data = await response.json();
         console.log(response.status)
-        setUsers(data);
-        
+        setUsers(data);    
     }
-
     useEffect(() => {
         getUsers();
     }, [])
 
-     useEffect(() => {
+     useEffect(() => {  
     // Filter the data based on the search query
     if (searchQuery.trim() === '') {
       // If search query is empty, show all data
