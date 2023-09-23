@@ -7,7 +7,7 @@ import { FaPhone } from 'react-icons/fa';
 let username = '' 
 let number =''
 
-const Card = ({ username, number, images, company, name, registrationYear, transmissionType, fuleType, seats, fastag, price, cityName}) => {
+ const Card = ({ username, number, images, company, name, registrationYear, transmissionType, fuleType, seats, fastag, price, cityName}) => {
     return (
       <div className="card">
       <div className="profile">
@@ -47,6 +47,7 @@ const CarPost = () => {
         const data = await response.json();
         console.log(response.status)
         setUsers(data);    
+        
     }
     useEffect(() => {
         getUsers();
@@ -63,14 +64,13 @@ const CarPost = () => {
             hostItem.cityName && hostItem.cityName.toLowerCase().includes(searchQuery.toLowerCase())
           )
       );
+      // const foundPost = users.host.find((post) => post.cityName === searchQuery);
+      // setFilteredData(foundPost)
       setFilteredData(filtered);
     //   console.log("filterData:- " + filteredData)
       // console.log("users:- " + users)
     }
   }, [searchQuery, users]);
-  for(let i = 0; i <= 10; i++){
-    
-  }
 
     return (
         
@@ -84,7 +84,7 @@ const CarPost = () => {
     /></div>
    
         <div className="main-component">
-            {filteredData.map(user => 
+            {users.map(user => 
               <div  key={user._id}>
               <div className="outer-card" >
               <div className="notexist">
@@ -93,7 +93,7 @@ const CarPost = () => {
               </div>
                 {user.host.reverse().map((obj, index) => (   
                     <Card 
-                    key={index} 
+                    // key={index} 
                     username = {username}
                     number = {number}
                     images = {obj.image}
@@ -117,16 +117,3 @@ const CarPost = () => {
 }
 
 export default CarPost;
-
-
-
-
-
-
-// <Carousel>
-//           {images.map((imagess, index) => (
-//             <div className="image-container" key={index}>
-//               <img src={`public//`+{imagess}} alt={`Image ${index}`} style={{ maxWidth: "400px", margin: "5px"}}/>
-//             </div>
-//           ))}
-//         </Carousel>

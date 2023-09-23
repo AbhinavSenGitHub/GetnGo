@@ -7,7 +7,7 @@ export const getToken = () => {
 };
 
 export const setToken = (token) => {
-  localStorage.setItem(SECRET_KEY, token);
+  localStorage.setItem("SECRET_KEY", token);
 };
 
 export const clearToken = () => {

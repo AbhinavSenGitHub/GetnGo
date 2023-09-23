@@ -1,68 +1,85 @@
 import React, { useEffect, useState } from 'react'
 import profile from "../assest/profile.png";
-import { Link } from 'react-router-dom';
-import { useNavigate } from 'react-router';
+// import { Link } from 'react-router-dom';
+// import { useNavigate } from 'react-router';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faMapMarkerAlt } from '@fortawesome/free-solid-svg-icons';
+import { faMapMarkerAlt, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { Carousel } from 'react-responsive-carousel';
 import { FaPhone } from 'react-icons/fa';
-import axios from 'axios';
-import jwtDecode from 'jwt-decode';
+let number = ""
 
 const Profile = () => {
-
-  const Card = () => {
-    return (
-      <div className="card">
-      <div className="profile">
-        <h3>username</h3>
-      </div>
- 
-      <Carousel>
-          {/* {images.map((imagess, index) => ( */}
-            <div className="image-container">
-              <img src="{imagess.secure_url} "alt="{imagess.public_id}" style={{ maxWidth: "400px", margin: "5px"}}/>
-            </div>
-          {/* ))} */}
-        </Carousel>
-        <div className="card-num-info">
-          <p className="cnr">company name registrationYear</p>
-          <p className="number"><FaPhone size={13} color="green" /> number</p>
-        </div>
-         <p className="tfs">transmissionType fuleType seats seats</p>
-         <p className="tag">FASTag:- fastag</p>
-        <div className="location">
-            <h4>₹ price /hr</h4>
-            <p><FontAwesomeIcon icon={faMapMarkerAlt} /> </p>
-        </div>
-      </div>
-    )
-  }
   const [userPosts, setUserPosts] = useState([]);
   const [token, setToken] = useState('');
-
-  useEffect(() => {
-    // Retrieve JWT token from local storage upon component mount
-    const storedToken = localStorage.getItem("token");
-    if (storedToken) {
-      setToken(storedToken);
-    }
-  }, []);
-
   const getUsers = async () => {
-    const response = await fetch('http://localhost:1234/api/profile', {
-        method: 'GET',
+    try{
+      const response = await fetch('http://localhost:1234/api/profile', {    
         headers: {
-          Authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
         },
     })
     const data = await response.json();
-    console.log("response.status:- " + response.status)
-    
+    setUserPosts(data)
+    }catch (e) {
+      console.log("error::--- "+ e)
+    }  
 }
+const handleDelete =  async (postId) => {
+  console.log(" postId: " + postId)
+  try{
+  let deleteResponce =  await fetch(`http://localhost:1234/api/delete/${postId}`, {
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem('token')}`,
+    },
+    method: 'GET',
+  })
+  // const data =  deleteResponce.data;
+  const data = await deleteResponce.json();
+  console.log("data:- " + data)
+}catch (e) {
+  console.log("error::--- "+ e)
+}  
+};
+
+  const Card = ({ index, number, images, company, name, registrationYear, transmissionType, fuleType, seats, fastag, price, cityName, postId}) => {
+    return (
+      <div className="card card-main">
+      <div className="profile">
+      <form action="" method="post" >
+      <button  className="delete-btn" >
+      <FontAwesomeIcon className="delete-icon" size={1} color="black" onClick={() => handleDelete(index)}  icon={faTrash} />
+      </button>
+      </form>
+      </div>
+      <Carousel>
+          {images.map((imagess, index) => (
+            <div className="image-container" key={index}>
+              <img src={imagess.secure_url} alt={imagess.public_id} style={{ maxWidth: "400px", margin: "5px"}}/>
+            </div>
+          ))}
+        </Carousel>
+        <div className="card-num-info">
+          <p className="cnr">{company} {name} {registrationYear}</p>
+          <p className="number"><FaPhone size={13} color="green" /> {number}</p>
+        </div>
+         
+         <p className="tfs">{transmissionType} {fuleType} {seats} seats</p>
+         <p className="tag">FASTag:- {fastag}</p>
+        <div className="location">
+            <h4>₹ {price} /hr</h4>
+            <p><FontAwesomeIcon icon={faMapMarkerAlt} /> {cityName}</p>
+        </div>
+      </div>
+    ); 
+  };
+
   useEffect(() => {
     // Fetch user-specific posts using the user's JWT
-    getUsers();
+    const storedToken = localStorage.getItem("token");
+    if (storedToken) {
+      setToken(storedToken);
+      getUsers();
+    }
   }, [token]);
 
   return (
@@ -70,35 +87,46 @@ const Profile = () => {
       <div className="profile-img">
         <img src={profile} alt="" />
       </div>
+        {userPosts.map((user) => (
       <div className="profile-text">
        <div>
-          <h1>Hello username</h1>
+          <h1>Hello {user.username}</h1>
           <p>Welcome to our platform on this page you can find all the posts of your vachiles you have posted on our platform!</p>
         </div> 
         <div>
-        <p className='total-post'>Total POST:- 0</p>
+          <p className='total-post'>Total POST:- {user.host.length}</p>
         </div>       
       </div>
-
-      <ul>
-          {userPosts.map((post) => (
-            <li key={post._id}>
-              <h3>{post.username}</h3>
-              <p>{post.number}</p>
-            </li>
-          ))}
-
-        </ul>
-
-      {/* <div className="main-component">
-              <div  >
+      ))}
+      <div className="main-component">
+          {userPosts.map((user) => (
+            <div  key={user._id}>
               <div className="outer-card" >
               <div className="notexist">
-              <p>Username</p>
-              <>number</>
-              </div><Card/></div>
+              {number = user.number}
+              </div>
+                {user.host.reverse().map((obj, index) => (  
+                    <Card 
+                    // key={index} 
+                    index = {index}
+                    number = {number}
+                    images = {obj.image}
+                    company={obj.company} 
+                    name={obj.name} 
+                    registrationYear={obj.registrationYear} 
+                    transmissionType={obj.transmissionType}
+                    fuleType={obj.fuleType}
+                    seats={obj.seats} 
+                    fastag={obj.fastag}
+                    price={obj.price}
+                    cityName={obj.cityName}
+                    postId={obj.postId}
+                    />
+                ))}
+                </div>
             </div>
-        </div> */}
+          ))}
+          </div>
     </div>
   )
 }

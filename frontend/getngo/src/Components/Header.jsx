@@ -14,18 +14,22 @@ const Header = () => {
       const toggleMenu = () => {
         setClicked(!clicked);
       };
+      const [token, setToken] = useState('');
+      
       useEffect(() => {
         // Check if the user is logged in by verifying the presence of a JWT token
-        const token = localStorage.getItem('token');
-        if (token) {
-          setLoggedIn(true);
-        } else {
-          setLoggedIn(false);
-        }
-      }, []);
+          const token = localStorage.getItem('token');
+          console.log("token is " + token);
+          if (!token) {
+            setLoggedIn(true);
+          } else {
+            setLoggedIn(false);
+          } 
+      }, [token]);
       const handleLogout = () => {
         localStorage.removeItem('token');
         setLoggedIn(false);
+        window.location.reload();
         navigate('/login');
       }
   return (
@@ -33,17 +37,17 @@ const Header = () => {
       <h1>GetnGo</h1>
       <main className= {` nav-bar-rs ${clicked ? "nav-rs-appear" : "nav-main-rs" }`}>
         <HashLink to = "/" className=" nav-rs">Home</HashLink> 
-        <HashLink to = "/servies" className="nav-rs">Services</HashLink>
+        {/* <HashLink to = "/servies" className="nav-rs">Services</HashLink> */}
         <HashLink to = "/carPost" className="nav-rs">Ride</HashLink>
-        {/* {!loggedIn?  */}
-        {/* ( */}
+        {!loggedIn? 
+        (
           <div className="login-part">
           <Link to="/profile"><FontAwesomeIcon icon={faUser} /></Link>
           <button type="submit" onClick={handleLogout}>Logout</button>
           </div>
-        {/* ): */}
-        <Link to = "/signIn" className="nav-rs" >Sign-Up</Link> 
-        {/* }    */}
+        ):
+        <Link to = "/signup" className="nav-rs" >Sign-Up</Link> 
+        }   
         
       </main>
       <div className="hamburger-btn" onClick={toggleMenu}>{clicked ? <FaBars className="hamburger" /> : <FaTimes/> }</div>

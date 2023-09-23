@@ -5,13 +5,13 @@ const bodyParser = require("body-parser");
 const cors = require("cors");
 const cookieSession = require("cookie-session");
 const session = require("express-session");
-const passport = require("passport");
-const LocalStrategy = require("passport-local").Strategy;
+// const passport = require("passport");
+// const LocalStrategy = require("passport-local").Strategy;
 const multer = require("multer");
 const path = require("path");
-const passportSetup = require("./passport");
+// const passportSetup = require("./passport");
+const uuid = require('uuid');
 // const authRoutes = require("./routes/auth");
-
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const SECRET_KEY = 'your-secret-key';
@@ -40,8 +40,8 @@ app.use(
     maxAge: 24 * 60 * 60 * 100,
   })
 );
-app.use(passport.initialize());
-app.use(passport.session());
+// app.use(passport.initialize());
+// app.use(passport.session());
 
 app.use(
   cors({
@@ -70,17 +70,17 @@ app.use(
   })
 );
 
-app.use(passport.initialize());
-app.use(passport.session());
+// app.use(passport.initialize());
+// app.use(passport.session());
 
-passport.serializeUser(function (user, done) {
-  done(null, user);
-});
-passport.deserializeUser(function (user, done) {
-  done(null, user);
-});
+// passport.serializeUser(function (user, done) {
+//   done(null, user);
+// });
+// passport.deserializeUser(function (user, done) {
+//   done(null, user);
+// });
 
-app.post("/api/signin", async (req, res) => {
+app.post("/api/signup", async (req, res) => {
   const { username, password, number, concent } = req.body;
   try {
     // Check if the username is already taken
@@ -110,8 +110,7 @@ app.post("/api/signin", async (req, res) => {
 
 
 app.post("/api/login", async (req, res) => {
-  const { number, password } = req.body;
-
+  const { number, password } = req.body
   try {
     // Find the user by username
     const user = await User.findOne({ number });
@@ -134,7 +133,6 @@ app.post("/api/login", async (req, res) => {
 })
 
 app.post("/api/host", upload.array("image", 16), async (req, res) => {
-  console.log("post log");
   const {
     vehicle,
     company,
@@ -147,7 +145,8 @@ app.post("/api/host", upload.array("image", 16), async (req, res) => {
     kmDriven,
     cityName,
     feedback,
-    price, } = req.body;
+    price,
+   } = req.body;
 
   let imagePath = [];
   for (let i = 0; i < req.files.length; i++) {
@@ -162,10 +161,10 @@ app.post("/api/host", upload.array("image", 16), async (req, res) => {
   }
   try {
     const decodedToken = jwt.verify(req.headers.authorization.split(' ')[1], SECRET_KEY);
-    const number = decodedToken.number;
-
+    console.log(decodedToken)
+    const number = decodedToken.number
     // Find the user by username
-    const user = await User.findOne({ number });
+    const user = await User.findOne({ number })
     if (!user) {
       return res.status(404).json({ message: 'User not found', success: false });
     }
@@ -184,10 +183,11 @@ app.post("/api/host", upload.array("image", 16), async (req, res) => {
       cityName,
       feedback,
       price,
+      postID: uuid.v4(),
     });
-
     // Save the updated user document
     await user.save()
+    // console.log("statue after host:-" + res.status())
     res.status(201).json({ message: 'Post created successfully', success: true });
   } catch (error) {
     console.error('Error creating post:', error);
@@ -196,35 +196,60 @@ app.post("/api/host", upload.array("image", 16), async (req, res) => {
 
 })
 
-
-
 function authenticateJWT(req, res, next) {
   const token = req.header('Authorization');
   console.log("token: " + token);
   if (!token) return res.status(401).json({ message: 'Unauthorized' });
-  jwt.verify(token, SECRET_KEY, (err, user) => {
-    if (err) return res.status(403).json({ message: 'Forbidden' });
+  jwt.verify(token.replace('Bearer ', ''), SECRET_KEY, (err, user) => {
+    if (err) return res.status(403).json({ message: err });
     req.user = user;
     next();
   });
 }
-
 app.get("/api/profile", authenticateJWT, async (req, res) => {
   const user = req.user.number;
-  console.log("profile:- " + user);
   try {
-    const userId = req.user._id; // Extract user ID from the JWT payload
-    console.log("userId:- " + userId)
-    // Fetch posts from the database based on userId using Mongoose
-    const userPosts = await Post.find({ userId });
+    const userPosts = await User.find({ number: user });
+
     console.log("userPosts:- " + userPosts)
     res.json(userPosts);
   } catch (error) {
     console.error('Error fetching user posts', error);
     res.status(500).json({ message: 'Internal server error' });
   }
-  
 })
+
+app.get("/api/delete/:postId", authenticateJWT,  (req, res) => {
+  const userID = req.user.number
+  const postIdToDelete = req.params.postId
+  console.log(postIdToDelete)
+  const user = User.find({ number: userID }).populate('host') .exec()
+  if (postIdToDelete !== -1) {
+    // Remove the post object from the 'posts' array
+    console.log("user:- " + user.username)
+    // user.host.splice([postIdToDelete], 1);
+
+    // Save the updated user document
+    const updatedUser = user.save();
+    res.json(updatedUser);
+  } else {
+    console.log('Post not found');
+  }
+  
+  // try {
+  //   const userPostss = await User.find({ number: user })
+  //   // const userPostss = await User.findOne({ 'host.postId': postIdToDelete})
+  //   console.log("userPosts for delete:- " + userPostss)
+  //   // console.log("host[index]" + userPostss.number)
+
+  //   // res.json(userPostss);
+  //   // res.status(200).json({ message: 'Post deleted successfully' });
+  // } catch (error) {
+  //   console.error('Error fetching user posts', error);
+  //   res.status(500).json({ message: 'Internal server error'});
+  // }
+})
+
 app.get("/demo", async (req, res) => {
   const docs = await User.find({});
   res.json(docs);
@@ -233,16 +258,3 @@ app.get("/demo", async (req, res) => {
 app.listen(1234, () => {
   console.log("Running on port 1234");
 })
-
-
-// profile
-// try {
-  //   const userPosts = User.findOne("1234567890")
-  //   if (!userPosts) {
-  //     return res.status(404).json({ message: 'User not found', success: false });
-  //   }
-  //   res.json(userPosts);
-  // } catch (error) {
-  //   console.error('Error fetching posts:', error);
-  //   res.status(500).json({ error: 'Unable to fetch posts' });
-  // }

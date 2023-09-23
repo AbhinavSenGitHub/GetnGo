@@ -2,16 +2,11 @@ import React, { useState } from 'react';
 import profile from "../assest/profile.png";
 import { Link } from "react-router-dom";
 import { useNavigate } from 'react-router';
-import { FaGoogle } from 'react-icons/fa';
+// import { FaGoogle } from 'react-icons/fa';
 import axios from "axios";
-import { setToken } from './tokenService';
+// import { setToken } from './tokenService';
 const SignIn = () => {
-  const googleAuth = () => {
-    window.open(
-      `${process.env.REACT_APP_API_URL}/auth/google/carpost`,
-      "_self"
-    );
-  }
+
   // user signUp data
   const navigate = useNavigate();
   const [username, setUsername] = useState('');
@@ -21,15 +16,16 @@ const SignIn = () => {
   const submit = async (e) => {
     e.preventDefault()
     try {
-       const response = await axios.post('http://localhost:1234/api/signin', {
+       const response = await axios.post('http://localhost:1234/api/signup', {
         username: username, password: password, number: number, concent: concent,
       });
       const {token} = response.data;
       if(response.status === 200){
-        localStorage.setItem(token, response.data.token); 
+        localStorage.setItem("token", token); 
         alert(response.data.message);
         
-        navigate('/carPost');      
+        navigate('/carPost'); 
+        window.location.reload();     
       }else if(response.status === 409 && !response.data.success){
         alert(response.data.message);
       }else{
@@ -56,11 +52,11 @@ const SignIn = () => {
               <input type="password" name="password" onChange={(e) => { setPassword(e.target.value) }} placeholder='Password' required/>
               <input type="text" name="number" onChange={(e) => { setNumber(e.target.value) }} placeholder='Phone number' required/>
 
-              <label>or</label>
-              <div className="google-icon">
+              {/* <label>or</label> */}
+              {/* <div className="google-icon">
                 <div className="FaGoogle-icon"><FaGoogle /></div>
                 <div className="continew-google" onClick={googleAuth}>Continue with google </div>
-              </div>
+              </div> */}
               <div className="concent">
                 
                 <p> <input type="checkbox" id="agreeCheckbox" name="agreeCheckbox" onChange={(e) => { setConcent(e.target.value) }} required/> I have read and aggred to all terms and conditions <br/> <span style={{color: 'gray'}}>Read our</span> <Link style={{color: 'blue'}} to="/concent"> terms and conditions</Link> </p>

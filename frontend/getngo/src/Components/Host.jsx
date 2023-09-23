@@ -126,7 +126,7 @@ const onSubmit = async (e) => {
       </div>
 
       <div>
-        <h3>Year of Car Registration</h3>
+        <h3>Year of Vachile Registration</h3>
         <input name="registrationYear" type="number" onChange={(e) => { setRegistrationYear(e.target.value) }}/>
         
       </div>
@@ -155,7 +155,7 @@ const onSubmit = async (e) => {
       </div>
 
       <div>
-        <h3>Car KM Driven</h3>
+        <h3>KM Driven</h3>
         <input name="kmDriven" type="text" onChange={(e) => { setKmDriven(e.target.value) }}/>
       </div>
 
