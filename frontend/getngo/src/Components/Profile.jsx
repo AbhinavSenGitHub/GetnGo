@@ -24,33 +24,33 @@ const Profile = () => {
       console.log("error::--- "+ e)
     }  
 }
-const handleDelete =  async (postId) => {
-  console.log(" postId: " + postId)
-  try{
-  let deleteResponce =  await fetch(`http://localhost:1234/api/delete/${postId}`, {
-    headers: {
-      Authorization: `Bearer ${localStorage.getItem('token')}`,
-    },
-    method: 'GET',
-  })
-  // const data =  deleteResponce.data;
-  const data = await deleteResponce.json();
-  console.log("data:- " + data)
-}catch (e) {
-  console.log("error::--- "+ e)
-}  
-};
+// const handleDelete =  async (postId) => {
+//   console.log(" postId: " + postId)
+//   try{
+//   let deleteResponce =  await fetch(`http://localhost:1234/api/delete/${postId}`, {
+//     headers: {
+//       Authorization: `Bearer ${localStorage.getItem('token')}`,
+//     },
+//     method: 'GET',
+//   })
+//   // const data =  deleteResponce.data;
+//   const data = await deleteResponce.json();
+//   console.log("data:- " + data)
+// }catch (e) {
+//   console.log("error::--- "+ e)
+// }  
+// };
 
   const Card = ({ index, number, images, company, name, registrationYear, transmissionType, fuleType, seats, fastag, price, cityName, postId}) => {
     return (
       <div className="card card-main">
-      <div className="profile">
+      {/* <div className="profile">
       <form action="" method="post" >
       <button  className="delete-btn" >
       <FontAwesomeIcon className="delete-icon" size={1} color="black" onClick={() => handleDelete(index)}  icon={faTrash} />
       </button>
       </form>
-      </div>
+      </div> */}
       <Carousel>
           {images.map((imagess, index) => (
             <div className="image-container" key={index}>

@@ -219,36 +219,36 @@ app.get("/api/profile", authenticateJWT, async (req, res) => {
   }
 })
 
-app.get("/api/delete/:postId", authenticateJWT,  (req, res) => {
-  const userID = req.user.number
-  const postIdToDelete = req.params.postId
-  console.log(postIdToDelete)
-  const user = User.find({ number: userID }).populate('host') .exec()
-  if (postIdToDelete !== -1) {
-    // Remove the post object from the 'posts' array
-    console.log("user:- " + user.username)
-    // user.host.splice([postIdToDelete], 1);
+// app.get("/api/delete/:postId", authenticateJWT,  (req, res) => {
+//   const userID = req.user.number
+//   const postIdToDelete = req.params.postId
+//   console.log(postIdToDelete)
+//   const user = User.find({ number: userID }).populate('host') .exec()
+//   if (postIdToDelete !== -1) {
+//     // Remove the post object from the 'posts' array
+//     console.log("user:- " + user.username)
+//     // user.host.splice([postIdToDelete], 1);
 
-    // Save the updated user document
-    const updatedUser = user.save();
-    res.json(updatedUser);
-  } else {
-    console.log('Post not found');
-  }
+//     // Save the updated user document
+//     const updatedUser = user.save();
+//     res.json(updatedUser);
+//   } else {
+//     console.log('Post not found');
+//   }
   
-  // try {
-  //   const userPostss = await User.find({ number: user })
-  //   // const userPostss = await User.findOne({ 'host.postId': postIdToDelete})
-  //   console.log("userPosts for delete:- " + userPostss)
-  //   // console.log("host[index]" + userPostss.number)
+//   // try {
+//   //   const userPostss = await User.find({ number: user })
+//   //   // const userPostss = await User.findOne({ 'host.postId': postIdToDelete})
+//   //   console.log("userPosts for delete:- " + userPostss)
+//   //   // console.log("host[index]" + userPostss.number)
 
-  //   // res.json(userPostss);
-  //   // res.status(200).json({ message: 'Post deleted successfully' });
-  // } catch (error) {
-  //   console.error('Error fetching user posts', error);
-  //   res.status(500).json({ message: 'Internal server error'});
-  // }
-})
+//   //   // res.json(userPostss);
+//   //   // res.status(200).json({ message: 'Post deleted successfully' });
+//   // } catch (error) {
+//   //   console.error('Error fetching user posts', error);
+//   //   res.status(500).json({ message: 'Internal server error'});
+//   // }
+// })
 
 app.get("/demo", async (req, res) => {
   const docs = await User.find({});
