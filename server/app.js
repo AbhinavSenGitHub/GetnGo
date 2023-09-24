@@ -161,7 +161,7 @@ app.post("/api/host", upload.array("image", 16), async (req, res) => {
   }
   try {
     const decodedToken = jwt.verify(req.headers.authorization.split(' ')[1], SECRET_KEY);
-    console.log(decodedToken)
+    // console.log(decodedToken)
     const number = decodedToken.number
     // Find the user by username
     const user = await User.findOne({ number })
@@ -210,8 +210,6 @@ app.get("/api/profile", authenticateJWT, async (req, res) => {
   const user = req.user.number;
   try {
     const userPosts = await User.find({ number: user });
-
-    console.log("userPosts:- " + userPosts)
     res.json(userPosts);
   } catch (error) {
     console.error('Error fetching user posts', error);
@@ -255,6 +253,6 @@ app.get("/demo", async (req, res) => {
   res.json(docs);
 })
 
-app.listen(1234, () => {
-  console.log("Running on port 1234");
+app.listen(process.env.P_PORT || 1000, () => {
+  console.log("Running on port " + process.env.P_PORT);
 })
