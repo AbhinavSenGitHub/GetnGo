@@ -1,0 +1,15 @@
+{
+  "files": {
+    "main.css": "/static/css/main.30e44e52.css",
+    "main.js": "/static/js/main.8ddc333e.js",
+    "static/media/myride.jpg": "/static/media/myride.07811ce97eb0ba2aab8f.jpg",
+    "static/media/profile.png": "/static/media/profile.c62e70bd4dba6f07d39c.png",
+    "index.html": "/index.html",
+    "main.30e44e52.css.map": "/static/css/main.30e44e52.css.map",
+    "main.8ddc333e.js.map": "/static/js/main.8ddc333e.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.30e44e52.css",
+    "static/js/main.8ddc333e.js"
+  ]
+}
