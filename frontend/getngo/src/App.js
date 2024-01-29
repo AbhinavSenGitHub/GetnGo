@@ -8,6 +8,7 @@ import Host from "./Components/Host";
 import Profile from "./Components/Profile";
 import CarPost from "./Components/CarPost";
 import Concent from "./Components/Concent"
+import NotFoundPage from "./Components/NotFoundPage"
 // import { initialState, reducer } from "./reducer/UseReducer";
 
 import "./styles/App.scss";
@@ -18,7 +19,7 @@ import "./styles/host.scss";
 import "./styles/profile.scss";
 import "./styles/carPost.scss";
 import "./styles/concent.scss";
-
+import "./styles/notFound.scss";
 function App() {
  
   const [authenticated, setAuthenticated] = useState(false);
@@ -35,8 +36,8 @@ function App() {
   }, []);
   return (
     <>
-    
     <Router>
+    
     <Header />
       <Routes>
       <Route path="/" element= {<Home/>} />
@@ -45,8 +46,9 @@ function App() {
       {/* <Route path="/host" element= {<Host/>} />  */}
       <Route path="/host" element={ authenticated ? <Host /> : <Login />} />
       <Route path="/carpost" element={ authenticated ? <CarPost/> : <Login />} />  
-      <Route path="/profile" element= {<Profile/>} />
-      <Route path="/concent" element= {<Concent/>} />              
+      <Route path="/profile" element= { authenticated ? <Profile/>: <Login/>} />
+      <Route path="/concent" element= {<Concent/>} />
+      <Route path="*" element= {<NotFoundPage/>} />
       </Routes>
     </Router>
     </>

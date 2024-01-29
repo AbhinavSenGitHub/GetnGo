@@ -6,9 +6,13 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faMapMarkerAlt, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { Carousel } from 'react-responsive-carousel';
 import { FaPhone } from 'react-icons/fa';
-let number = ""
+import { useNavigate } from "react-router-dom";
 
+import axios from 'axios';
+let number = ""
+let userId = ""
 const Profile = () => {
+  const navigate = useNavigate();
   const [userPosts, setUserPosts] = useState([]);
   const [token, setToken] = useState('');
   const getUsers = async () => {
@@ -20,37 +24,31 @@ const Profile = () => {
     })
     const data = await response.json();
     setUserPosts(data)
+    console.log(data)
     }catch (e) {
       console.log("error::--- "+ e)
     }  
 }
-// const handleDelete =  async (postId) => {
-//   console.log(" postId: " + postId)
-//   try{
-//   let deleteResponce =  await fetch(`http://localhost:1234/api/delete/${postId}`, {
-//     headers: {
-//       Authorization: `Bearer ${localStorage.getItem('token')}`,
-//     },
-//     method: 'GET',
-//   })
-//   // const data =  deleteResponce.data;
-//   const data = await deleteResponce.json();
-//   console.log("data:- " + data)
-// }catch (e) {
-//   console.log("error::--- "+ e)
-// }  
-// };
+const handleDelete =  async (userId, hostId) => {
+  console.log(userId)
+  console.log( hostId)
+  try{
+    const response = await axios.delete(`http://localhost:1234/api/delete/users/${userId}/hosts/${hostId}`)
+    if (response.status === 200) {
+      // Redirect to the home route after successful deletion
+      alert("Your car post deleted successfully")
+      navigate('/profile');
+    }
+  }
+  catch (e) {
+  console.log("error::--- "+ e)
+}  
+}
 
-  const Card = ({ index, number, images, company, name, registrationYear, transmissionType, fuleType, seats, fastag, price, cityName, postId}) => {
+  const Card = ({ userId, hostId, number, images, company, name, registrationYear, transmissionType, fuleType, seats, fastag, price, cityName, postId}) => {
     return (
-      <div className="card card-main">
-      {/* <div className="profile">
-      <form action="" method="post" >
-      <button  className="delete-btn" >
-      <FontAwesomeIcon className="delete-icon" size={1} color="black" onClick={() => handleDelete(index)}  icon={faTrash} />
-      </button>
-      </form>
-      </div> */}
+      <div className="card card-main"> 
+      <div> <button class="custom-button" onClick={() => handleDelete(userId, hostId)}>DELETE</button></div>
       <Carousel>
           {images.map((imagess, index) => (
             <div className="image-container" key={index}>
@@ -90,8 +88,8 @@ const Profile = () => {
         {userPosts.map((user) => (
       <div className="profile-text">
        <div>
-          <h1>Hello {user.username}</h1>
-          <p>Welcome to our platform on this page you can find all the posts of your vachiles you have posted on our platform!</p>
+          <h1>OLLA👋  {user.username}</h1>
+          <p>y dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It wa</p>
         </div> 
         <div>
           <p className='total-post'>Total POST:- {user.host.length}</p>
@@ -104,11 +102,13 @@ const Profile = () => {
               <div className="outer-card" >
               <div className="notexist">
               {number = user.number}
+              {userId = user._id}
               </div>
                 {user.host.reverse().map((obj, index) => (  
                     <Card 
                     // key={index} 
-                    index = {index}
+                    userId = {userId}
+                    hostId={obj.host_id}
                     number = {number}
                     images = {obj.image}
                     company={obj.company} 
@@ -121,6 +121,7 @@ const Profile = () => {
                     price={obj.price}
                     cityName={obj.cityName}
                     postId={obj.postId}
+                    
                     />
                 ))}
                 </div>

@@ -32,8 +32,14 @@ const SignIn = () => {
         alert(response.data.message)
       }
     }
-    catch (e) {
-      console.log(e);
+    catch (error) {
+      if (error.response && error.response.status === 500) {
+        // Display a custom "Login failed" message to the user
+        alert('SignUp failed. Please check your credentials.');
+      } else {
+        // Handle other errors or show a generic error message
+        alert('An error occurred. Please try again later.');
+      }
     }
   }
 

@@ -4,18 +4,19 @@ import {Link} from "react-router-dom";
 import { Carousel } from "react-responsive-carousel";
 import "react-responsive-carousel/lib/styles/carousel.min.css";
 import { useNavigate } from "react-router-dom";
+import Loader from "./LoaderSpin";
 const Host = (authenticated) => {
   const navigate = useNavigate();
   const [image, setImage] = useState([]);
   const [filePreviews, setFilePreviews] = useState([]);
-
+  const [loader, setLoader] = useState(false);
   const handleFileChange = (event) => {
     const selectedFiles = Array.from(event.target.files);
     setImage(selectedFiles);
 
     const previews = selectedFiles.map(file => URL.createObjectURL(file));
     setFilePreviews(previews);
-  };
+  }
 
   const [vehicle, setVehicle] = useState('');
   const [company, setCompany] = useState('');
@@ -33,6 +34,7 @@ const Host = (authenticated) => {
 
 
 const onSubmit = async (e) => {
+  setLoader(true)
   const formData = new FormData();
   // formData.append("image", image);
   for (let i = 0; i < image.length; i++) {
@@ -60,6 +62,7 @@ const onSubmit = async (e) => {
 
     if(response.data.success){
       navigate('/carPost');
+      setLoader(false)
     }
   }
   catch(e) {
@@ -70,6 +73,8 @@ const onSubmit = async (e) => {
   
 //onChange={handleImageChange}
   return (
+    <>
+    {loader ? <Loader/> : (
     <div className="host-main">
     <div className="host-sub-main">
     <h1 className="heading">Add your car details here</h1>
@@ -95,7 +100,7 @@ const onSubmit = async (e) => {
 
       <div className="input-fields">
       <div>
-        <h3>Vachile Type</h3>
+        <h3>Vehicle Type</h3>
         {/* <input type="text" value={carNumber} onChange={handleCarNumberChange} /> */}
         <select name="vehicle" onChange={(e) => { setVehicle(e.target.value) }}>
         <option value="">-</option>
@@ -110,7 +115,7 @@ const onSubmit = async (e) => {
       </div>
 
       <div>
-        <h3>Vachile name</h3>
+        <h3>Vehicle name</h3>
         <input name="name" type="text" onChange={(e) => { setName(e.target.value)}}/>
       </div>
 
@@ -126,7 +131,7 @@ const onSubmit = async (e) => {
       </div>
 
       <div>
-        <h3>Year of Vachile Registration</h3>
+        <h3>Year of Vehicle Registration</h3>
         <input name="registrationYear" type="number" onChange={(e) => { setRegistrationYear(e.target.value) }}/>
         
       </div>
@@ -179,7 +184,8 @@ const onSubmit = async (e) => {
       
       </form>
       </div>
-    </div>
+    </div>)}
+    </>
   );
 };
 

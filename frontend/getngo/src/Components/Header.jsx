@@ -34,7 +34,7 @@ const Header = () => {
       }
   return (
     <nav>
-      <h1>GetnGo</h1>
+      <h1><Link to="/">GetnGo</Link></h1>
       <main className= {` nav-bar-rs ${clicked ? "nav-rs-appear" : "nav-main-rs" }`}>
         <HashLink to = "/" className=" nav-rs">Home</HashLink> 
         {/* <HashLink to = "/servies" className="nav-rs">Services</HashLink> */}
