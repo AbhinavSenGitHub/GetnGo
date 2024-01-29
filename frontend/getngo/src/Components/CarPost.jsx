@@ -42,7 +42,7 @@ const CarPost = () => {
   const [filteredData, setFilteredData] = useState([]);
 
   const getUsers = async () => {
-    const response = await fetch('http://localhost:1234/demo', {
+    const response = await fetch('/demo', {
       method: 'GET',
     })
     const data = await response.json();
@@ -61,7 +61,7 @@ const CarPost = () => {
   useEffect(() => {
 
     const fetchSearchResults = async () => {
-        const response = await fetch(`http://localhost:1234/search?query=${query}`);
+        const response = await fetch(`/search?query=${query}`);
         const data = await response.json();
         setSearchResults(data)
         console.log(data)

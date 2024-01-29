@@ -17,7 +17,7 @@ const Profile = () => {
   const [token, setToken] = useState('');
   const getUsers = async () => {
     try{
-      const response = await fetch('http://localhost:1234/api/profile', {    
+      const response = await fetch('/api/profile', {    
         headers: {
           Authorization: `Bearer ${localStorage.getItem('token')}`,
         },
@@ -33,7 +33,7 @@ const handleDelete =  async (userId, hostId) => {
   console.log(userId)
   console.log( hostId)
   try{
-    const response = await axios.delete(`http://localhost:1234/api/delete/users/${userId}/hosts/${hostId}`)
+    const response = await axios.delete(`/api/delete/users/${userId}/hosts/${hostId}`)
     if (response.status === 200) {
       // Redirect to the home route after successful deletion
       alert("Your car post deleted successfully")

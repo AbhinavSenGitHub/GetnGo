@@ -16,7 +16,7 @@ const SignIn = () => {
   const submit = async (e) => {
     e.preventDefault()
     try {
-       const response = await axios.post('http://localhost:1234/api/signup', {
+       const response = await axios.post('/api/signup', {
         username: username, password: password, number: number, concent: concent,
       });
       const {token} = response.data;

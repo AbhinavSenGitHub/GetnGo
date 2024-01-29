@@ -54,7 +54,7 @@ const onSubmit = async (e) => {
   formData.append("price", price);
 
   try{
-     const response = await axios.post('http://localhost:1234/api/host', formData, {
+     const response = await axios.post('/api/host', formData, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem('token')}`,
       },
