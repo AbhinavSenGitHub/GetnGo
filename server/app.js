@@ -10,13 +10,13 @@ const session = require("express-session");
 const multer = require("multer");
 const path = require("path");
 // const passportSetup = require("./passport");
-const uuid = require('uuid');
+// const uuid = require('uuid');
 // const authRoutes = require("./routes/auth");
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const SECRET_KEY = 'your-secret-key';
-
-
+const { v4: uuidv4 } = require('uuid');
+const uniqueId = uuidv4();
 const app = express();
 const formidable = require("formidable");
 const cloudinary = require("cloudinary");
@@ -24,7 +24,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cors());
 app.use("/image", express.static(path.join(__dirname, "public")));
-
+const {MongoClient, ObjectId} = require('mongodb')
 // cloudinary setup
 cloudinary.config({
   cloud_name: "getngo",
@@ -123,7 +123,7 @@ app.post("/api/login", async (req, res) => {
       return res.status(401).json({ message: 'Invalid password', success: false });
     }
     const token = jwt.sign({ number: number }, SECRET_KEY);
-    console.log(token);
+    // console.log(token);
     // res.json({ token });
     res.status(200).json({ message: 'Login successful', success: true, token });
   } catch (error) {
@@ -131,6 +131,13 @@ app.post("/api/login", async (req, res) => {
     res.status(500).json({ error: 'An error occurred while logging in' });
   }
 })
+
+function convertUUIDtoObjectId(uuid) {
+  const hex = uuid.replace(/-/g, '');
+  const buffer = Buffer.from(hex, 'hex');
+  const objectId = new ObjectId(buffer);
+  return objectId;
+}
 
 app.post("/api/host", upload.array("image", 16), async (req, res) => {
   const {
@@ -146,7 +153,7 @@ app.post("/api/host", upload.array("image", 16), async (req, res) => {
     cityName,
     feedback,
     price,
-   } = req.body;
+  } = req.body;
 
   let imagePath = [];
   for (let i = 0; i < req.files.length; i++) {
@@ -183,7 +190,8 @@ app.post("/api/host", upload.array("image", 16), async (req, res) => {
       cityName,
       feedback,
       price,
-      postID: uuid.v4(),
+      host_id: new ObjectId(),
+      // postID: uuid.v4(),
     });
     // Save the updated user document
     await user.save()
@@ -198,7 +206,7 @@ app.post("/api/host", upload.array("image", 16), async (req, res) => {
 
 function authenticateJWT(req, res, next) {
   const token = req.header('Authorization');
-  console.log("token: " + token);
+  // console.log("token: " + token);
   if (!token) return res.status(401).json({ message: 'Unauthorized' });
   jwt.verify(token.replace('Bearer ', ''), SECRET_KEY, (err, user) => {
     if (err) return res.status(403).json({ message: err });
@@ -217,37 +225,74 @@ app.get("/api/profile", authenticateJWT, async (req, res) => {
   }
 })
 
-// app.get("/api/delete/:postId", authenticateJWT,  (req, res) => {
-//   const userID = req.user.number
-//   const postIdToDelete = req.params.postId
-//   console.log(postIdToDelete)
-//   const user = User.find({ number: userID }).populate('host') .exec()
-//   if (postIdToDelete !== -1) {
-//     // Remove the post object from the 'posts' array
-//     console.log("user:- " + user.username)
-//     // user.host.splice([postIdToDelete], 1);
+app.get('/search', async (req, res) => {
+  try {
+    const { query } = req.query; // Assuming query parameter is 'query'
+    console.log(query)
+    if (!query || query.trim() === '') {
+      // If the query is empty or only contains whitespace, retrieve all users
+      const allUsers = await User.find();
+      if (allUsers.length === 0) {
+        return res.status(404).json({ message: 'No users found' });
+      }
+      // Return all users
+      return res.json(allUsers);
+    }
+    const usersWithQueryString = await User.aggregate([
+      {
+      $match: {
+          'host.cityName': { $regex: query, $options: 'i' }
+        }
+      },
+      {
+        $unwind: '$host'
+      },
+      {
+        $match: {
+          'host.cityName': { $regex: query, $options: 'i' }
+        }
+      },
+      {
+        $group: {
+          _id: '$_id',
+          username: { $first: '$username' },
+          number: { $first: '$number' },
+          host: { $push: '$host' }
+        }
+      },
+      {
+        $project: {
+          username: 1,
+          number: 1,
+          host: 1
+        }
+      }
+    ]);
+    console.log(usersWithQueryString);
+    if (!usersWithQueryString) {
+      console.log("not found")
+      return res.status(404).json({ message: 'User not found for the specified city' });
+    }
+    if (usersWithQueryString) {
+      res.json(usersWithQueryString)
+    }
+  } catch (error) {
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
 
-//     // Save the updated user document
-//     const updatedUser = user.save();
-//     res.json(updatedUser);
-//   } else {
-//     console.log('Post not found');
-//   }
-  
-//   // try {
-//   //   const userPostss = await User.find({ number: user })
-//   //   // const userPostss = await User.findOne({ 'host.postId': postIdToDelete})
-//   //   console.log("userPosts for delete:- " + userPostss)
-//   //   // console.log("host[index]" + userPostss.number)
-
-//   //   // res.json(userPostss);
-//   //   // res.status(200).json({ message: 'Post deleted successfully' });
-//   // } catch (error) {
-//   //   console.error('Error fetching user posts', error);
-//   //   res.status(500).json({ message: 'Internal server error'});
-//   // }
-// })
-
+app.delete("/api/delete/users/:userId/hosts/:hostId", async (req, res) => {
+  const {userId, hostId} = req.params;
+  console.log(userId, hostId);
+  const user = await User.findOne({ _id: userId });
+   console.log(user.host);
+   const result = await User.updateOne(
+    { _id: new ObjectId(userId) }, // Match the user by its ID
+    { $pull: { host: { host_id: new ObjectId(hostId) } } } // Pull the host object using its ID
+  );
+// console.log(updatedUser)
+    res.status(200).json({ message: 'Host object deleted successfully' });
+})
 app.get("/demo", async (req, res) => {
   const docs = await User.find({});
   res.json(docs);
